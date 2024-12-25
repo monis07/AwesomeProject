@@ -1,118 +1,105 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+import {View, Text, StyleSheet, TextInput, ScrollView, KeyboardAvoidingView, Platform, Pressable, TouchableOpacity} from 'react-native';
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [task, setTask] = React.useState<string>('');
+  const [taskarr, settaskarr] = React.useState<string[]>([]);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const handleAdd = () => {
+    settaskarr([...taskarr, task]);
+    setTask('');
+  }
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.heading}>Today's Task</Text>
+          <View style={{marginTop: 15}}>
+            {taskarr.map((task, index) => (
+              <Pressable onPress={() => {
+                settaskarr(taskarr.filter((_, i) => i !== index))}
+                }>
+                <Task key={index} task={task} />
+              </Pressable>))}
+            </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+      <View style={styles.inputContainer}>
+        <TextInput
+          onChange={(e) => setTask(e.nativeEvent.text)}
+          value={task}
+          style={styles.input}
+        />
+        <TouchableOpacity onPress={handleAdd}>
+          <Text style={{borderColor:'black', borderWidth:1, padding:10, borderRadius:8, marginBottom:10, backgroundColor:'black', color:'white', fontWeight:'bold'}}>Send</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  scrollView: {
+    flexGrow: 1,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  innerContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    // justifyContent: 'space-between',
+    padding: 20,
   },
-  highlight: {
-    fontWeight: '700',
+  heading: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    margin: 20,
+  },
+  inputContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 20,
+    marginBottom: 20,
+    borderColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  input: {
+    borderColor: 'black',
+    borderWidth: 2,
+    width: '80%',
+    marginBottom: 10,
+    borderRadius: 8,
+    padding: 10,
+  },
+  task: {
+    borderWidth: 1,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 15,
+    padding: 10,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
+
+function Task(props) {
+  return (
+    props.task ? (
+      <View style={styles.task}>
+        <View style={{borderWidth: 2, borderColor: "black", borderRadius: 50, width: 15, height: 15, marginRight: 6}}></View>
+        <Text>{props.task}</Text>
+      </View>
+    ) : (
+      <Text></Text>
+    )
+  );
+}
 
 export default App;
